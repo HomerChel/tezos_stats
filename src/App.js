@@ -1,36 +1,10 @@
-// import 'react-app-polyfill/stable';
 import React from 'react';
 import './App.css';
-import { TezosToolkit } from '@taquito/taquito';
-import { BeaconWallet } from '@taquito/beacon-wallet';
-
-const tezos = new TezosToolkit('https://mainnet.api.tez.ie');
-
-const options = {
-  name: 'MyAwesomeDapp',
-  iconUrl: 'https://tezostaquito.io/img/favicon.svg',
-  preferredNetwork: 'mainnet',
-  // eventHandlers: {
-  //   PERMISSION_REQUEST_SUCCESS: {
-  //     handler: async (data) => {
-  //       console.log('permission data:', data);
-  //     },
-  //   },
-  // },
-};
-const wallet = new BeaconWallet(options);
-
-function Button(props) {
-  return (
-    <button onClick={props.onClick}>{props.text}</button>
-  )
-}
-
-function Graph(props) {
-  return (
-    <div>{props.balance || '---'}</div>
-  )
-}
+import {tezos, wallet} from './tezos/init';
+import {SyncButton} from './components/SyncButton'
+import {Graph} from './components/Graph'
+import {Balance} from './components/Balance'
+import {DataAPI} from './tezos/DataAPI'
 
 class App extends React.Component {
   constructor(props) {
@@ -38,7 +12,8 @@ class App extends React.Component {
     this.state = {
       synced: false,
       tzAddress: null,
-      balance: null
+      balance: null,
+      graphData: null,
     }
   }
 
@@ -53,6 +28,8 @@ class App extends React.Component {
       });
       tezos.setWalletProvider(wallet);
       tzAddress = await wallet.getPKH();
+
+      this.state.graphData = await (new DataAPI(tzAddress).balanceHistory());
     } else {
       wallet.clearActiveAccount();
     }
@@ -78,12 +55,17 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <Button
+        <SyncButton
           text={this.state.synced ? 'unsync' : 'sync'}
           onClick={() => this.sync()}
         />
         <br />
-        <Graph balance={this.state.balance} />
+        {this.state.balance &&
+          <Balance balance={this.state.balance} />
+        }
+        {this.state.graphData &&
+          <Graph data={this.state.graphData}/>
+        }
       </div>
     );
   }
