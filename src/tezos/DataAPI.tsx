@@ -1,4 +1,3 @@
-// import https from 'https-browserify';
 const https = require('https-browserify');
 
 class DataAPI {
@@ -55,7 +54,7 @@ class DataAPI {
 
       const req = https.request(options, (res: any) => {
         let data = '';
-        let result: any;
+        let result: Promise<Array<[]> | Array<any>>;
 
         res.on('data', (d: string) => {
           data += d;
