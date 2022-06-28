@@ -1,4 +1,4 @@
-function Balance(props) {
+function Balance(props: {balance: string}) {
   return (
     <div>{props.balance}</div>
   )

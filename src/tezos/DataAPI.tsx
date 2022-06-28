@@ -1,7 +1,10 @@
-import https from 'https-browserify';
+// import https from 'https-browserify';
+const https = require('https-browserify');
 
 class DataAPI {
-  constructor(tzAddress) {
+  tzAddress: string;
+
+  constructor(tzAddress: string) {
     this.tzAddress = tzAddress;
   }
 
@@ -11,17 +14,19 @@ class DataAPI {
     const time = await this.firstTransactionTime();
     const path = `/series/balance?start_date=${time}&collapse=1d&address=${tzAddress}`;
 
+    let data: Array<number[]>;
+    let result: Array<{x: number, y: number}> = [];
 
-    let data = await this.getRequest(hostname, path);
+    data = await this.getRequest(hostname, path);
 
-    data.forEach(function(value, i, arr) {
-      arr[i] = {
+    data.forEach(function(value: Array<number>) {
+      result.push({
         x: value[0],
-        y: value[1]
-      }
+        y: value[1],
+      })
     })
 
-    return data;
+    return result;
   }
 
   async firstTransactionTime() {
@@ -33,13 +38,13 @@ class DataAPI {
     let time = Date.now();
     
     data.forEach((value) => {
-      if (value[4] < time) time = value[4];
+      if (value[4] !== undefined && value[4] < time) time = value[4];
     });
 
     return(time);
   }
 
-  async getRequest(hostname, path) {
+  async getRequest(hostname: string, path: string): Promise<Array<[]> | Array<any>> {
     return new Promise(function (resolve, reject) {
       const options = {
         hostname: hostname,
@@ -48,21 +53,22 @@ class DataAPI {
         method: 'GET'
       }
 
-      const req = https.request(options, res => {
+      const req = https.request(options, (res: any) => {
         let data = '';
+        let result: any;
 
-        res.on('data', d => {
+        res.on('data', (d: string) => {
           data += d;
         })
 
-        res.on('end', d => {
-          data = JSON.parse(data);
+        res.on('end', () => {
+          result = JSON.parse(data);
 
-          resolve(data);
+          resolve(result);
         })
       })
 
-      req.on('error', error => {
+      req.on('error', (error: any) => {
         console.error(error)
       })
 

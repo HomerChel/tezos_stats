@@ -1,18 +1,25 @@
 import React from 'react';
-import './App.css';
-import {tezos, wallet} from './tezos/init';
+import {tezos, wallet, NetworkType} from './tezos/init';
 import {SyncButton} from './components/SyncButton'
 import {Graph} from './components/Graph'
 import {Balance} from './components/Balance'
 import {DataAPI} from './tezos/DataAPI'
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+type appProps = {};
+type appState = {
+  synced: boolean,
+  tzAddress: string | null,
+  balance: string,
+  graphData: Array<{x: number, y: number}> | null,
+}
+
+class App extends React.Component<appProps, appState> {
+  constructor() {
+    super({});
     this.state = {
       synced: false,
       tzAddress: null,
-      balance: null,
+      balance: '',
       graphData: null,
     }
   }
@@ -23,29 +30,31 @@ class App extends React.Component {
     if (!synced) {
       await wallet.requestPermissions({
         network: {
-          type: 'mainnet',
+          type: NetworkType.MAINNET,
         },
       });
       tezos.setWalletProvider(wallet);
       tzAddress = await wallet.getPKH();
 
-      this.state.graphData = await (new DataAPI(tzAddress).balanceHistory());
+      this.setState({
+        graphData: await (new DataAPI(tzAddress).balanceHistory())
+      });
     } else {
       wallet.clearActiveAccount();
     }
-    this.updateBalance(tzAddress);
+    this.updateBalance(tzAddress!);
     this.setState({
       synced: !synced,
       tzAddress: tzAddress
     });
   }
 
-  async updateBalance(tzAddress) {
-    let balance;
+  async updateBalance(tzAddress: string) {
+    let balance: string;
     if (tzAddress) {
-      balance = await tezos.tz.getBalance(tzAddress).then((b) => {return(`${b.toNumber() / 1000000} ꜩ`)});
+      balance = await tezos.tz.getBalance(tzAddress).then((b) => {return(`${(b.toNumber() / 1000000).toFixed(2)} ꜩ`)});
     } else {
-      balance = null;
+      balance = '';
     }
     this.setState({
       balance: balance

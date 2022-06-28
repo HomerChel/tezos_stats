@@ -1,5 +1,6 @@
 import { TezosToolkit } from '@taquito/taquito';
 import { BeaconWallet } from '@taquito/beacon-wallet';
+import { NetworkType } from '@airgap/beacon-types';
 
 // module.exports = {
   const tezos = new TezosToolkit('https://mainnet.api.tez.ie');
@@ -7,7 +8,7 @@ import { BeaconWallet } from '@taquito/beacon-wallet';
   const wallet = new BeaconWallet({
     name: 'MyAwesomeDapp',
     iconUrl: 'https://tezostaquito.io/img/favicon.svg',
-    preferredNetwork: 'mainnet',
+    preferredNetwork: NetworkType.MAINNET,
     // eventHandlers: {
     //   PERMISSION_REQUEST_SUCCESS: {
     //     handler: async (data) => {
@@ -17,4 +18,4 @@ import { BeaconWallet } from '@taquito/beacon-wallet';
     // },
   })
 
-  export {tezos, wallet};
+  export {tezos, wallet, NetworkType};
