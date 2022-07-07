@@ -13,6 +13,7 @@
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
+    "axios": "^0.27.2",
     "core-js": "^3.23.1",
     "create-react-app": "^5.0.1",
     "daisyui": "^2.17.0",

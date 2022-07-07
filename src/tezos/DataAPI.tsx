@@ -1,4 +1,5 @@
 const https = require('https-browserify');
+const axios = require('axios').default;
 
 class DataAPI {
   tzAddress: string;
@@ -10,20 +11,24 @@ class DataAPI {
   async balanceHistory() {
     const tzAddress = this.tzAddress;
     const hostname = 'api.tzstats.com';
-    const time = await this.firstTransactionTime();
-    const path = `/series/balance?start_date=${time}&collapse=1d&address=${tzAddress}`;
+    const path = `/series/balance?collapse=1d&address=${tzAddress}&start_date=`;
+    let startTransactionTime = await this.firstTransactionTime();
 
     let data: Array<number[]>;
     let result: Array<{x: number, y: number}> = [];
 
-    data = await this.getRequest(hostname, path);
+    while (result.length <= 0 || result[result.length-1].x <= Date.now() - 24*60*60*1000) {
+      data = await this.getRequest(hostname, path + startTransactionTime);
 
-    data.forEach(function(value: Array<number>) {
-      result.push({
-        x: value[0],
-        y: value[1],
+      data.forEach(function(value: Array<number>) {
+        result.push({
+          x: value[0],
+          y: value[1],
+        })
       })
-    })
+
+      startTransactionTime = result[result.length - 1].x;
+    }
 
     return result;
   }
@@ -45,33 +50,13 @@ class DataAPI {
 
   async getRequest(hostname: string, path: string): Promise<Array<[]> | Array<any>> {
     return new Promise(function (resolve, reject) {
-      const options = {
-        hostname: hostname,
-        port: 443,
-        path: path,
-        method: 'GET'
-      }
-
-      const req = https.request(options, (res: any) => {
-        let data = '';
-        let result: Promise<Array<[]> | Array<any>>;
-
-        res.on('data', (d: string) => {
-          data += d;
-        })
-
-        res.on('end', () => {
-          result = JSON.parse(data);
-
-          resolve(result);
-        })
+      axios.get('https://' + hostname + path, )
+      .then(function (response: any) {
+        resolve(response.data);
       })
-
-      req.on('error', (error: any) => {
-        console.error(error)
+      .catch(function (error: any) {
+        reject(error);
       })
-
-      req.end()
     }
   )}
 }
