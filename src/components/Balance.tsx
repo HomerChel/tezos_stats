@@ -1,6 +1,8 @@
 function Balance(props: {balance: string}) {
   return (
-    <div>{props.balance}</div>
+    <div className="p-4 w-full">
+      {props.balance}
+    </div>
   )
 }
 

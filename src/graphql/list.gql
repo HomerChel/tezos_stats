@@ -1,0 +1,29 @@
+query MyQuery($account: String = "") {
+  token(where: {holders: {holder_address: {_eq: $account}}}) {
+    asks(order_by: {amount: asc}) {
+      price
+      id
+      seller_address
+      amount
+      contract_version
+    }
+    offers(limit: 1, order_by: {price: desc}) {
+      id
+    }
+    creators {
+      creator_address
+    }
+    fa_contract
+    token_id
+    hen_swaps(order_by: {price: asc}, where: {contract: {_eq: "KT1HbQepzV1nVGg8QVznG7z4RcHseD5kwqBn"}}) {
+      amount
+      contract
+      price
+      swap_id
+      seller_address
+    }
+    display_uri
+    name
+    artifact_uri
+  }
+}
