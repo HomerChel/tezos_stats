@@ -21,12 +21,14 @@ class Operations {
 
   async batchUpdatePrices(priceList: { [index: string]: priceInfo }, authorFee: number): Promise<any> {
     let operations = [];
-    operations.push({
-      kind: OpKind.TRANSACTION,
-      to: 'tz1e7JZvt4zmScKU7UVrKvHnpXjsQ6GJewV6', // account for tips
-      amount: authorFee * 1000000,
-      mutez: true,
-    });
+    if (authorFee > 0) {
+      operations.push({
+        kind: OpKind.TRANSACTION,
+        to: 'tz1e7JZvt4zmScKU7UVrKvHnpXjsQ6GJewV6', // account for tips
+        amount: authorFee * 1000000,
+        mutez: true,
+      });
+    }
     let objktContract = await this.tezos.contract.at('KT1WvzYHCNBvDSdwafTHv7nJ1dWmZ8GCYuuC');
     let henContract = await this.tezos.contract.at('KT1HbQepzV1nVGg8QVznG7z4RcHseD5kwqBn');
     for (let key in priceList) {
@@ -34,15 +36,15 @@ class Operations {
         // add retract ask operation
         if (priceList[key].marketplace === 'KT1WvzYHCNBvDSdwafTHv7nJ1dWmZ8GCYuuC') {
           operations.push({
-            kind: OpKind.TRANSACTION,
             ...objktContract.methods.retract_ask(priceList[key].saleId).toTransferParams(),
+            kind: OpKind.TRANSACTION,
             storageLimit: 350,
           });
         }
         if (priceList[key].marketplace === 'KT1HbQepzV1nVGg8QVznG7z4RcHseD5kwqBn') {
           operations.push({
-            kind: OpKind.TRANSACTION,
             ...henContract.methods.cancel_swap(priceList[key].saleId).toTransferParams(),
+            kind: OpKind.TRANSACTION,
             storageLimit: 350,
           });
         }
@@ -71,10 +73,10 @@ class Operations {
           ]
         };
         operations.push({
+          ...transferParams,
           kind: OpKind.TRANSACTION,
           storageLimit: 350,
           mutez: true,
-          ...transferParams,
         });
       }
 
