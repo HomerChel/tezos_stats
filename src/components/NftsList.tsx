@@ -31,8 +31,8 @@ function NftsList(props: { nftsList: Array<any>, updatePrices: Function }) {
                 <td className="p-2"><a target="_blank" href={nft.link}>{nft.name}</a></td>
                 <td className="p-2"><a target="_blank" href={nft.creatorlink}>{nft.creator}</a></td>
                 <td className="p-2">{nft.old ? nft.old + ' (' + nft.market + ')' : ''}</td>
-                <td className="p-2">{nft.min ? nft.min : ''}</td>
-                <td className="p-2">{nft.minHen ? nft.minHen : ''}</td>
+                <td className="p-2">{nft.min !== false ? nft.min : ''}</td>
+                <td className="p-2">{nft.minHen !== false ? nft.minHen : ''}</td>
                 <td className="p-2">
                   <NewPriceInput
                     rowId={'row' + index}

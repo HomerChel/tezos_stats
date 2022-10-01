@@ -93,7 +93,13 @@ class DataAPI {
             alias
           }
         }
-        hen_swaps(order_by: {price: asc}, where: {contract: {_eq: "KT1HbQepzV1nVGg8QVznG7z4RcHseD5kwqBn"}}) {
+        hen_swaps: hen_swaps(order_by: {price: asc}, where: {contract: {_eq: "KT1HbQepzV1nVGg8QVznG7z4RcHseD5kwqBn"}, status: {_eq: "active"}}) {
+          amount
+          price
+          swap_id
+          seller_address
+        }
+        teia_swaps: hen_swaps(order_by: {price: asc}, where: {contract: {_eq: "KT1PHubm9HtyQEJ4BBpMTVomq6mhbfNZ9z5w"}, status: {_eq: "active"}}) {
           amount
           price
           swap_id
@@ -128,16 +134,23 @@ class DataAPI {
         let result = [];
         for (let i = 0; i < res.data.data.token.length; i++) {
           let token = res.data.data.token[i];
-          let min = token.asks.length ? (token.asks[0].price / 1000000) : 0;
-          let minHen = token.hen_swaps.length ? (token.hen_swaps[0].price / 1000000) : 0;
+          let min: number | false = false;
+          if (token.asks.length > 0 && token.teia_swaps.length <= 0) {
+            min = token.asks[0].price / 1000000;
+          } else if (token.asks.length <= 0 && token.teia_swaps.length > 0) {
+            min = token.teia_swaps[0].price / 1000000;
+          } else if (token.asks.length > 0 && token.teia_swaps.length > 0) {
+            min = Math.min(token.asks[0].price / 1000000, token.teia_swaps[0].price / 1000000);
+          }
+          let minHen: number | false = token.hen_swaps.length ? (token.hen_swaps[0].price / 1000000) : false;
           for (let j = 0; j < token.holders[0].quantity; j++) {
             let filtered = {
               name: '',
               link: '',
               creator: '',
               creatorlink: '',
-              min: 0,
-              minHen: 0,
+              min: 0 as number | false,
+              minHen: 0 as number | false,
               offer: 0,
               old: 0,
               market: '',
