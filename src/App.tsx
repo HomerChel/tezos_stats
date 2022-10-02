@@ -23,6 +23,7 @@ type appState = {
   tzAddress: string | null,
   balance: string,
   nftsList: Array<any>,
+  summs: {user: number, min: number, offer: number},
   graphData: Array<{ x: number, y: number }> | null,
   priceList: { [index: string]: priceInfo },
   authorFee: number,
@@ -36,6 +37,7 @@ class App extends React.Component<appProps, appState> {
       tzAddress: null,
       balance: '',
       nftsList: [],
+      summs: {user: 0, min: 0, offer: 0},
       graphData: null,
       priceList: {},
       authorFee: 0.01,
@@ -58,8 +60,11 @@ class App extends React.Component<appProps, appState> {
       //   graphData: await (new DataAPI(tzAddress).balanceHistory())
       // });
 
+      let {nftsList, summs} = await (new DataAPI(tzAddress).getNFTs());
+
       this.setState({
-        nftsList: await (new DataAPI(tzAddress).getNFTs())
+        nftsList: nftsList,
+        summs: summs
       });
     } else {
       wallet.clearActiveAccount();
@@ -142,6 +147,7 @@ class App extends React.Component<appProps, appState> {
           {!!this.state.nftsList.length &&
             <NftsList
               nftsList={this.state.nftsList}
+              summs={this.state.summs}
               updatePrices={(priceInfo: priceInfo) => this.updatePrices(priceInfo)}
             />
           }

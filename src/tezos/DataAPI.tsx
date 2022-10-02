@@ -132,6 +132,7 @@ class DataAPI {
       console.log(res.data.data.token);
       try {
         let result = [];
+        let summs = {user: 0, min: 0, offer: 0};
         for (let i = 0; i < res.data.data.token.length; i++) {
           let token = res.data.data.token[i];
           let min: number | false = false;
@@ -199,17 +200,32 @@ class DataAPI {
                 }
               }
             }
+            summs.user += filtered.old;
+            summs.min += (min !== false ? min : Number.MAX_VALUE) > (minHen !== false ? minHen : Number.MAX_VALUE) ? (minHen ? minHen : 0) : (min ? min : 0);
+            summs.offer += filtered.offer;
             result.push(filtered);
           }
         }
         console.log(result);
-        return result;
+        summs.user = +summs.user.toFixed(2);
+        summs.min = +summs.min.toFixed(2);
+        summs.offer = +summs.offer.toFixed(2);
+        return {
+          nftsList: result,
+          summs: summs
+        };
       } catch (e) {
         console.error('dataAPI getNFTs error: ', e);
-        return [];
+        return {
+          nftsList: [],
+          summs: {user: 0, min: 0, offer: 0}
+        };
       }
     }
-    return []
+    return {
+      nftsList: [],
+      summs: {user: 0, min: 0, offer: 0}
+    };
   }
 
   async getRequest(hostname: string, path: string): Promise<Array<[]> | Array<any>> {

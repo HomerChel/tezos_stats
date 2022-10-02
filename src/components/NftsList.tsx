@@ -10,7 +10,7 @@ type priceInfo = {
   newPrice: string,
 };
 
-function NftsList(props: { nftsList: Array<any>, updatePrices: Function }) {
+function NftsList(props: { nftsList: Array<any>, summs: {user: number, min: number, offer: number}, updatePrices: Function }) {
   return (
     <div className="content-center w-full">
         <table className="table-auto border-spacing-1 border border-slate-400 border-separate">
@@ -47,6 +47,13 @@ function NftsList(props: { nftsList: Array<any>, updatePrices: Function }) {
                 <td className="p-2">{nft.offer ? nft.offer : ''}</td>
               </tr>
             ))}
+            <tr>
+              <td colSpan={2} className="p-2 text-right">Summs:</td>
+              <td className="p-2 bg-gray-700 text-center">{props.summs.user}</td>
+              <td colSpan={2} className="p-2 bg-gray-700 text-center">{props.summs.min}</td>
+              <td className="p-2"></td>
+              <td className="p-2 bg-gray-700 text-center">{props.summs.offer}</td>
+            </tr>
           </tbody>
         </table>
     </div>
