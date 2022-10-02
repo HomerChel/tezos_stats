@@ -106,7 +106,9 @@ class App extends React.Component<appProps, appState> {
     }
 
     authorFee = 0.01 * Object.keys(priceList).length;
-    document.getElementById('authorFee')!.setAttribute('value', authorFee.toString());
+    // @ts-ignore
+    let res = document.getElementById('authorFee').value = authorFee.toString();
+    console.log(authorFee.toString());
 
     this.setState({
       priceList: priceList,
