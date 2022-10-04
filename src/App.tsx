@@ -110,7 +110,7 @@ class App extends React.Component<appProps, appState> {
       }
     }
 
-    authorFee = 0.01 * Object.keys(priceList).length;
+    authorFee = +(0.01 * Object.keys(priceList).length).toFixed(2);
     // @ts-ignore
     let res = document.getElementById('authorFee').value = authorFee.toString();
     console.log(authorFee.toString());
