@@ -31,6 +31,7 @@ class Operations {
     }
     let objktContract = await this.tezos.contract.at('KT1WvzYHCNBvDSdwafTHv7nJ1dWmZ8GCYuuC');
     let henContract = await this.tezos.contract.at('KT1HbQepzV1nVGg8QVznG7z4RcHseD5kwqBn');
+    let teiaContract = await this.tezos.contract.at('KT1PHubm9HtyQEJ4BBpMTVomq6mhbfNZ9z5w');
     for (let key in priceList) {
       if (priceList[key].saleId) {
         // add retract ask operation
@@ -44,6 +45,13 @@ class Operations {
         if (priceList[key].marketplace === 'KT1HbQepzV1nVGg8QVznG7z4RcHseD5kwqBn') {
           operations.push({
             ...henContract.methods.cancel_swap(priceList[key].saleId).toTransferParams(),
+            kind: OpKind.TRANSACTION,
+            storageLimit: 350,
+          });
+        }
+        if (priceList[key].marketplace === 'KT1PHubm9HtyQEJ4BBpMTVomq6mhbfNZ9z5w') {
+          operations.push({
+            ...teiaContract.methods.cancel_swap(priceList[key].saleId).toTransferParams(),
             kind: OpKind.TRANSACTION,
             storageLimit: 350,
           });

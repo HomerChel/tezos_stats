@@ -200,6 +200,18 @@ class DataAPI {
                 }
               }
             }
+            if (!filtered.old) {
+              for (let k = 0; k < token.teia_swaps.length; k++) {
+                if (token.teia_swaps[k].seller_address === this.tzAddress) {
+                  filtered.old = token.teia_swaps[k].price / 1000000;
+                  filtered.market = 'Teia';
+                  filtered.marketplace = 'KT1PHubm9HtyQEJ4BBpMTVomq6mhbfNZ9z5w';
+                  filtered.saleId = token.teia_swaps[k].swap_id;
+                  token.teia_swaps.splice(k, 1);
+                  break;
+                }
+              }
+            }
             summs.user += filtered.old;
             summs.min += (min !== false ? min : Number.MAX_VALUE) > (minHen !== false ? minHen : Number.MAX_VALUE) ? (minHen ? minHen : 0) : (min ? min : 0);
             summs.offer += filtered.offer;
