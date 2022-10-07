@@ -8,6 +8,7 @@ import {
 import './index.css';
 import Root from './Root';
 import ReswapObjkt from './ReswapObjkt';
+import IncomingFxhash from './IncomingFxhash';
 import reportWebVitals from './reportWebVitals';
 
 const router = createBrowserRouter([
@@ -19,15 +20,17 @@ const router = createBrowserRouter([
         path: "/",
         element: <ReswapObjkt />,
       },
+      {
+        path: "/fxhash_incoming",
+        element: <IncomingFxhash />,
+      },
     ],
   },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  <RouterProvider router={router} />
 );
 
 // If you want to start measuring performance in your app, pass a function

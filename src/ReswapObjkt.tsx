@@ -36,6 +36,7 @@ function ReswapObjkt() {
   });
 
   useEffect(() => {
+    if (!tzAddress) return;
     (new DataAPI(tzAddress).getNFTs()).then(({ nftsList, summs, hasErrors }) => {
       setState({
         ...state,

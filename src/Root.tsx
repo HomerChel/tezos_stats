@@ -68,7 +68,7 @@ class Root extends React.Component<rootProps, rootState> {
             <Balance balance={this.state.balance} />
           }
         </div>
-          {!!this.state.tzAddress && <Outlet context={[this.state.tzAddress]}/>}
+          <Outlet context={[this.state.tzAddress]}/>
       </div>
     );
   }
