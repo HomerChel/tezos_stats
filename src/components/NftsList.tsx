@@ -28,7 +28,7 @@ function NftsList(props: { nftsList: Array<any>, summs: {user: number, min: numb
           <tbody>
             {props.nftsList.map((nft, index) => (
               <tr id={'row-' + index} className="odd:bg-gray-900 even:bg-gray-800">
-                <td className="p-2"><a target="_blank" href={nft.link}>{nft.name}</a></td>
+                <td className="p-2"><a target="_blank" href={nft.link}>{nft.name} {nft.operatorError && <em className="text-red-300">with error</em>}</a></td>
                 <td className="p-2"><a target="_blank" href={nft.creatorlink}>{nft.creator}</a></td>
                 <td className="p-2">{nft.old ? nft.old + ' (' + nft.market + ')' : ''}</td>
                 <td className="p-2">{nft.min !== false ? nft.min : ''}</td>

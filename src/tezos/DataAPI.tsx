@@ -51,6 +51,10 @@ class DataAPI {
   async getNFTs() {
     const query = `
     query MyQuery($account: String = "") {
+      objkt_operators: token(where: {holders: {holder_address: {_eq: $account}, quantity: {_gt: "0"}}, fa_contract: {_nin: ["KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE", "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi"]}, creators: {creator_address: {_neq: $account}}, operators: {operator_address: {_eq: "KT1WvzYHCNBvDSdwafTHv7nJ1dWmZ8GCYuuC"}, owner_address: {_eq: $account}}}, order_by: {timestamp: desc}) {
+        fa_contract
+        token_id
+      }
       token(where: {holders: {holder_address: {_eq: $account}, quantity: {_gt: "0"}}, fa_contract: {_nin: ["KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE", "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi"]}, creators: {creator_address: {_neq: $account}}}, order_by: {timestamp: asc}) {
         fa_contract
         token_id
@@ -129,7 +133,18 @@ class DataAPI {
     })
 
     if (res.data) {
+      let hasErrors = false;
       console.log(res.data.data.token);
+      console.log(res.data.data.objkt_operators);
+
+      let checkObjktOperator = (tokenId: string, contract: string) => {
+        let result = true;
+        res.data.data.objkt_operators.forEach((value: any) => {
+          if (value.token_id === tokenId && value.fa_contract === contract) result = false;
+        })
+        return result;
+      }
+
       try {
         let result = [];
         let summs = {user: 0, min: 0, offer: 0};
@@ -160,6 +175,7 @@ class DataAPI {
               faContract: '',
               tokenId: '',
               royalties: [] as {recipient: string, amount: number}[],
+              operatorError: false,
             };
             filtered.name = token.name;
             filtered.link = `https://objkt.com/asset/${token.fa_contract}/${token.token_id}`;
@@ -184,6 +200,7 @@ class DataAPI {
                 filtered.market = 'Objkt';
                 filtered.marketplace = 'KT1WvzYHCNBvDSdwafTHv7nJ1dWmZ8GCYuuC';
                 filtered.saleId = token.asks[k].id;
+                filtered.operatorError = checkObjktOperator(token.token_id, token.fa_contract);
                 token.asks.splice(k, 1);
                 break;
               }
@@ -215,6 +232,7 @@ class DataAPI {
             summs.user += filtered.old;
             summs.min += (min !== false ? min : Number.MAX_VALUE) > (minHen !== false ? minHen : Number.MAX_VALUE) ? (minHen ? minHen : 0) : (min ? min : 0);
             summs.offer += filtered.offer;
+            if (filtered.operatorError) hasErrors = true;
             result.push(filtered);
           }
         }
@@ -224,19 +242,17 @@ class DataAPI {
         summs.offer = +summs.offer.toFixed(2);
         return {
           nftsList: result,
-          summs: summs
+          summs: summs,
+          hasErrors: hasErrors,
         };
       } catch (e) {
         console.error('dataAPI getNFTs error: ', e);
-        return {
-          nftsList: [],
-          summs: {user: 0, min: 0, offer: 0}
-        };
       }
     }
     return {
       nftsList: [],
-      summs: {user: 0, min: 0, offer: 0}
+      summs: {user: 0, min: 0, offer: 0},
+      hasErrors: false,
     };
   }
 
