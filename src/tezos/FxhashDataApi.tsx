@@ -2,7 +2,44 @@ import axios from 'axios';
 
 class FxhashDataApi {
 
-  async getIncoming() {
+  async getTwitter(address: string): Promise<string | false> {
+    const query = `
+      query MyQuery {
+        tzprofiles_by_pk(account: "${address}") {
+          valid_claims
+        }
+      }`;
+
+    let postData = JSON.stringify({
+      query: query,
+      variables: null,
+      operationName: 'MyQuery'
+    });
+
+    let res = await axios.post('https://indexer.tzprofiles.com/v1/graphql', postData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': postData.length
+      }
+    })
+
+    if (res.data && res.data.data && res.data.data.tzprofiles_by_pk && res.data.data.tzprofiles_by_pk.valid_claims) {
+      try {
+        for (let i in res.data.data.tzprofiles_by_pk.valid_claims) {
+          let info = JSON.parse(res.data.data.tzprofiles_by_pk.valid_claims[i][1]);
+          if (info.evidence && info.evidence.tweetId) {
+            return info.evidence.handle;
+          }
+        }
+      } catch (e) {
+        console.log(`Error while parsing tzProfiles for ${address}`, e);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  async getIncoming(): Promise<{ [key: string]: any; }[] | false > {
     const query = `
       fragment Author on GenerativeToken {
         author {
@@ -91,13 +128,20 @@ class FxhashDataApi {
     })
 
     if (res.data && res.data.data && res.data.data.generativeTokens) {
-      for (let i = 0; i < res.data.data.generativeTokens.length; i++) {
-        res.data.data.generativeTokens[i].totalReserves = 0;
-        for (let j = 0; j < res.data.data.generativeTokens[i].reserves.length; j++) {
-          res.data.data.generativeTokens[i].totalReserves += res.data.data.generativeTokens[i].reserves[j].amount;
+      const promises = await res.data.data.generativeTokens.map(async (token: { [index: string]: any }): Promise<{ [index: string]: any }> => {
+        token.twitterHandle = await this.getTwitter(token.author.id);
+        return token;
+      })
+      const tokens = await Promise.all(promises);
+
+      for (let i = 0; i < tokens.length; i++) {
+        tokens[i].totalReserves = 0;
+        for (let j = 0; j < tokens[i].reserves.length; j++) {
+          tokens[i].totalReserves += tokens[i].reserves[j].amount;
         }
       }
-      return res.data.data.generativeTokens;
+      console.log(tokens);
+      return tokens;
     }
     return false;
   }

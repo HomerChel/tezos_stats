@@ -16,7 +16,7 @@ class Root extends React.Component<rootProps, rootState> {
     super({});
     this.state = {
       synced: false,
-      tzAddress: null,
+      tzAddress: null, //'tz1YHaPUA5eTJq9NAJcDrZRsXhaDxuGsDNYd',
       balance: '',
     }
   }
