@@ -20,8 +20,8 @@ function IncomingFxhash() {
   return (
     <div className="container">
       {incomingList.map((art, index) => (
-        <div key={index} className="flex row-auto p-2">
-          <div className="p-2">
+        <div key={index} className="flex row-auto py-4">
+          <div className="pr-4">
             <a href={'https://www.fxhash.xyz/generative/' + art.id} target="_blank" rel="noreferrer">
               <img
                 className="w-40 h-40 object-contain border border-gray-700"
@@ -29,7 +29,7 @@ function IncomingFxhash() {
                 alt={art.name} />
             </a>
           </div>
-          <div className="p-2">
+          <div>
             <h3 className="font-bold"><a href={'https://www.fxhash.xyz/generative/' + art.id} target="_blank" rel="noreferrer">{art.name}</a></h3>
             <p>
               <a href={'https://www.fxhash.xyz/pkh/' + art.author.id} target="_blank" rel="noreferrer">{art.author.name} </a>

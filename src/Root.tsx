@@ -58,7 +58,7 @@ class Root extends React.Component<rootProps, rootState> {
 
   render() {
     return (
-      <div className="container mx-auto">
+      <div className="container mx-auto min-h-screen pb-[5rem] relative px-4">
         <div className="container py-4 columns-5">
           <Button
             text={this.state.synced ? 'unsync' : 'sync'}
@@ -68,7 +68,15 @@ class Root extends React.Component<rootProps, rootState> {
             <Balance balance={this.state.balance} />
           }
         </div>
-          <Outlet context={[this.state.tzAddress]}/>
+        <Outlet context={[this.state.tzAddress]} />
+        <footer className="container py-4 absolute bottom-0">
+          <p>
+            Author: <a href="https://twitter.com/AAlternator" className="text-blue-300" target="_blank" rel="noreferrer">art_alternator</a>
+          </p>
+          <p>
+            For donations: <span className="text-blue-300">tz1e7JZvt4zmScKU7UVrKvHnpXjsQ6GJewV6</span>
+          </p>
+        </footer>
       </div>
     );
   }
